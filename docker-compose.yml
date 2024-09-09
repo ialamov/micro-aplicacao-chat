@@ -1,0 +1,41 @@
+services:
+  app:
+    image: node:latest
+    working_dir: /var/app
+    environment: 
+      TZ: "America/Sao_Paulo"
+    restart: always
+    container_name: app
+    ports:
+      - target: 5555
+        published: 5555
+        protocol: tcp
+    volumes:
+      - ./:/var/app
+    networks:
+      - chat
+    depends_on:
+      - database
+    command: sh -c "npm install && npm run dev"
+
+  database:
+    image: postgres:latest
+    restart: always
+    container_name: database
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
+    environment:
+      POSTGRES_DB: development
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      TZ: "America/Sao_Paulo"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - chat
+
+networks:
+  chat:
+    driver: bridge
